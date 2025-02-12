@@ -1,0 +1,119 @@
+---
+title: "The journey of Leetcode(1)"
+description: "Learn how to use Generics"
+image: "/images/blog/how-to-type-env.webp"
+date: "2024-05-30"
+author: "devbertskie"
+---
+
+
+# The journey of Leetcode(1)
+
+Hi ! 我是Will，這篇文章分享我開始刷 leetcode 的過程，分享我採用的方法與解決過程。
+
+在軟體公司擔任前端工程師兩年，主要工作都在開發專案功能，在每一個sprint中忙著解決問題，同事創了一個 slack leetcode 群，我便開始我的第一題 — [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/)，他是ㄧ題關於驗證括號閉合的正確性的演算法，我記得我硬寫寫出來，以下是當初的程式碼。
+```ts
+    const isValid = function(s) {
+      const pairList = []
+      let result = false
+      const isPair = (first, second)=>{
+        let pairResult = false;
+        const arr = [‘{’,‘}’,‘[’,‘]’,‘(’,‘)’]
+        const firstIndex = arr.indexOf(first)
+        const secondIndex =  arr.indexOf(second)
+        if( firstIndex % 2 !== 0) return false
+        return firstIndex + 1 === secondIndex
+      }
+     // even
+      if(s.length % 2 !== 0) return result
+     // to array
+     const sArray = s.split(‘’)
+     // loop
+     for(let i of sArray){
+       pairList.push(i)
+       const top = pairList[pairList.length - 1]
+       const minorTop = pairList[pairList.length - 2]
+       if(!!minorTop && isPair(minorTop,top)){
+        pairList.pop()
+        pairList.pop()
+       }
+     }
+     if(pairList.length === 0){
+       result = true
+     }
+     return result
+    };
+```
+結果同事回饋看不太懂 XD 我現在看也是閱讀困難，我用寫功能的邏輯先寫了一個函數 isPair驗證括號 是否配對成功，並在stack 中驗證若 isPair 則 pop 。可以看出來誤打誤撞用對了stack的邏輯，但我記得我花了一個下午才解出來。
+
+但我看到同事使用了一個很神奇的解法，以下是他的程式碼
+```ts
+    var isValid = function (s) {
+      if (s.length === 1) return false;
+    
+      const a = [];
+    
+      for (let i = 0; i < s.length; i++) {
+        switch (s[i]) {
+          case "(":
+            a.push(")");
+            break;
+          case "{":
+            a.push("}");
+            break;
+          case "[":
+            a.push("]");
+            break;
+        }
+    
+        if (s[i] === ")" || s[i] === "}" || s[i] === "]") {
+          let c = a.pop();
+    
+          if (s[i] !== c) return false;
+        }
+      }
+    
+      if (a.length > 0) return false;
+    
+      return true;
+    };
+```
+看完真的很崇拜他，好簡潔的程式碼，雖然概念跟我類似但是想法很特別，若是看到 “(“ 就在 stack 中塞入 “)”。
+
+往後的幾題發現每一題都花一個下午，實在不太有效率，我便開始看看大家如何刷題，我在找一個方法能實現：**能每天執行，並在執行中不斷彌補知識斷層**
+
+## neetcode
+
+首先我使用了一個網站 [neetcode](https://neetcode.io/)，他整理了150題根據類型來刷題，包括 arrays & Hashing / Two pointer / sliding Window / Tree，根據不同的題型給你 easy / medium / hard 讓你循序漸進，並且有提供解答，我發現照這個脈絡我比較能藉由刷題學會一種結構
+
+![](https://cdn-images-1.medium.com/max/2404/1*Ensse4uHa9RdWR71qbytlA.png)
+
+## udemy —資料結構與演算法
+
+之前學python時看到老師，教學非常仔細，而且是中文吸收比較快速，他會從畫白板窮舉、虛擬碼、再到實際寫出程式碼，讓我對不同演算法的運作嘖嘖稱奇，非常推薦老師的課程。並且隨著主題越聊越深，我發現演算法最終離不開數學，我希望之後能繼續上老師的「離散數學課程」
+
+![](https://cdn-images-1.medium.com/max/2000/1*Q0NC8B1XjPHb1xUUclnwhA.png)
+
+## **LeetCode**
+
+我會將上課學到的關鍵字，搭配neetcode的題型，最後到[leetcode](https://leetcode.com/) 官網實際註冊帳號，先在vscode本地寫一次，然後在實際丟到網路上看該解法的效能，若解不出來，還可以看大神們的 solution跟 neetcode 的影片講解
+
+總解，我深信系統的重要，就是每日執行並能獲的具體的、清晰的結果回饋，我的日計畫便出來了
+
+1. udemy 理解資料結構
+
+1. 試時間完成 easy / medium 一題，找前一天學習相關的主題
+
+1. 先自行解一次
+
+1. 若超過太久(1小時以上)便看答案的解題思路
+
+1. 試著照解題思在自行寫出來
+
+1. 若還是寫不出來，則看答案
+
+1. 整理至 [Github](https://github.com/hongsheng27/leetcode) 留下足跡，並寫下每一題的 note，同使歸納出自己對於這個結構的理解
+
+1. 若覺得可以在精進可以利用leetcode 的 tag 找類似題型在寫一題
+
+alright, 以上自我整理得解題思路，在連續開始進行已經一個月，我已經看完初階的資料結構，目前正在看 tree 跟 graph 的部分，並持將所學輸出於題目上，雖然我還是常常對於一題想破頭還是想不出來，但我對於解題的手法正在逐步闊大！對於知識的斷層逐步縮小！

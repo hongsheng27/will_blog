@@ -1,0 +1,175 @@
+---
+title: "Generics"
+description: "Learn how to use Generics"
+image: "/images/blog/any-considered.webp"
+date: "2024-05-30"
+author: "devbertskie"
+---
+
+# Generics
+
+basic concept
+
+Normally, Without generics, we would either have to give the function a specific type:
+```ts
+    function identity(arg: number): number {
+      return arg;
+    }
+
+    function identity(arg: string): string {
+      return arg;
+    }
+```
+However, we want to resue the function, using abstact concept to define the function by using a *type variable ‘T’*, to tell typsecript what type we want dynamically. As a result , We can give it different type base on different scenario.
+```ts
+    function identity<T>(arg: T): T {
+      return arg;
+    }
+    
+    // arrow function
+      const loggingIdentity:<T>(arg: T) => T = (arg) => {
+        return arg
+      }
+```
+Then we can add type variable to the identity function. This Type allows us to capture the type the user provides (e.g. string), so that we can use that information later. Here, we use Type again as the return type
+```ts
+    let output = identity<string>("myString");
+```
+The second way is also perhaps the most common. Here we use *type argument inference* — that is, we want the compiler to set the value of Type for us automatically based on the type of the argument we pass in:
+```ts
+    let output = identity("myString");
+```
+Notice that we didn’t have to explicitly pass the type in the angle brackets (`<>`); the compiler just looked at the value "myString", and set Type to its type. While type argument inference can be a helpful tool to keep code shorter and more readable.
+
+## Generic Constraints
+
+if we want to also log the length of the argument arg to the console with each call? We might be tempted to write this:
+```ts
+    function loggingIdentity<Type>(arg: Type): Type {
+      console.log(arg.length); // Property 'length' does not exist on type 'Type'.
+      return 
+    }
+```
+Someone using this function could have passed in a number instead, which does not have a .length member.
+
+Let’s say that we’ve actually intended this function to work on arrays of Type rather than Type directly. Since we’re working with arrays, the .length member should be available. We can describe this just like we would create arrays of other types:
+```ts
+    function loggingIdentity<Type>(arg: Type[]): Type[] {
+      console.log(arg.length);
+      return arg;
+    }
+```
+as same as this way
+```ts
+    function loggingIdentity<Type>(arg: Array<Type>): Array<Type> {
+      console.log(arg.length); // Array has a .length, so no more error
+      return arg;
+    }
+```
+### **extend : add some constrainst**
+
+In TypeScript, the extends keyword can be used to restrict the types that can be passed to generics or as part of type conditional types. To be more specific, the idea is "**T needs to satisfy number**," but more precisely, it refers to "**T is a subset of number.**"
+
+for example, In this case, we want to confine T must to be number. Then we can use key word ‘extend’
+```ts
+    function identity<T extend number>(arg: T): Type {
+      return arg;
+    }
+```
+In this case, arg value must to be number or string
+```ts
+    function identity<T extend number | string>(arg: T): Type {
+      return arg;
+    }
+```
+Give a more pratical example, this function can print user first name and last name, but we want to make sure
+
+1.it can take any Type as parameter
+2. the parameter must have first name and last name,
+
+we can use ‘generic constraints’ to constraint the paramters.
+```ts
+    interface PersonName {
+      firstName: string;
+      lastName: string;
+    }
+    
+    // 使用 T extends PersonName，限制 T 一定要是 PersonName 型別的子集合
+    function logPersonName<T extends PersonName>(person: T) {
+      return `${person.firstName} ${person.lastName}`;
+    }
+```
+Case2: change enum to key
+
+when we need to pass an object or enum to a function as paramter, you can adopt the approach descrived below. This implies that the paramter must be an object with the random keys of type string, each associated with a value that is also a string
+```ts
+    function getEnumKeyByEnumValue<T extends { [index: string]: string }>(
+        myEnum: T,
+        enumValue: string,
+      ): keyof T | null {
+        const keys = Object.keys(myEnum).filter(x => myEnum[x] == enumValue)
+        return keys.length > 0 ? keys[0] : null
+    }
+    
+    const result = getEnumKeyByEnumValue(myEnum, TargetValue)
+    
+```
+In this code, `{ [index: string]: string }` , is a TypeScript type definition that represents an object where all the keys are strings and all the values are also strings, and Enum format meet the constraintion as wee. Using below concept to explain.
+```ts
+    // use the object concept
+    // use square brackets to indicate random value
+    
+    let index = 'age'
+    const obj = {
+      [index]: 30
+    }
+    console.log(obj) // {age: 30}
+```
+### typescript Multiple Generic Parameters
+
+when you are using generics, you can pass multiple paramters like below
+```ts
+      function exchange<T, U>(first: T, second: U) {
+        return [first, second]
+      }
+```
+Try harder example, now we want a easy function can get value of objectit can take two paramters:
+
+1. The first one is an object, and the second is a key from that object.
+
+1. What it returns is the value associated with that key in the object.
+
+and we can write the code below
+```ts
+    const user = {
+        firstName: 'Will',
+        lastName: 'Liu',
+        age: 29,
+        isAdmin: true,
+      }
+    
+      const product = {
+        name: 'Mac Pro',
+        price: 30000,
+        manufacturer: 'Apple',
+        madeIn: 'China',
+      }
+    
+      function getObjValue<T>(obj: T, key: keyof T) {
+        return obj[key]
+      }
+```
+but this time we want to constrain key to be specific key , like ‘firstName’ adn ‘Last Name’, then we can add second paramter type.
+
+First , let’s give it the second paramter
+```ts
+     function getObjValue<T, U extends keyof T>(obj: T, key: U) {
+        return obj[key]
+     }
+```
+Next, we can get varoable by constraining by specific key
+```ts
+    type User = typeof user
+    const MyUser = getObjValue<User, 'firstName' | 'lastName'>(user, 'lastName')
+    const MyProduct = getObjValue(product, 'price')
+```

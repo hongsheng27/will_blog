@@ -1,0 +1,314 @@
+---
+title: "Why Next.js app router"
+description: "Learn how to use next.js app"
+image: "/images/blog/derive-decouple.webp"
+date: "2024-05-30"
+author: "devbertskie"
+---
+# Why Next.js app router
+
+next.js purpose
+
+Nextjs is a react framwork for building full-stack application. You use React Components to build user interfaces, and Next.js for additional features and optimizations.
+
+Next.js also allows you to focus on building your application instead of spending time with configuration.
+
+![](https://cdn-images-1.medium.com/max/2000/1*PJ87QhnDB4G5r6GynPSEVw.png)
+
+* Main Feature
+> Router — A file-system based router built on top of Server Components that supports layouts, nested routing, loading states, error handling, and more.
+> Render — Client-side and Server-side Rendering with Client and Server Components. Further optimized with Static and Dynamic Rendering on the server with Next.js. Streaming on Edge and Node.js runtimes.
+> Data Fetching — Simplified data fetching with async/await in Server Components, and an extended fetch API for request memoization, data caching and revalidation.
+> Styling — Support for your preferred styling methods, including CSS Modules, Tailwind CSS, and CSS-in-JS
+> Optimizations — Image, Fonts, and Script Optimizations to improve your application’s Core Web Vitals and User Experience.
+> Typescript — Improved support for TypeScript, with better type checking and more efficient compilation, as well as custom TypeScript Plugin and type checker.
+
+### App Router
+
+Next.js has two different routers: the App Router and the Pages Router, The App Router is a newer router that allows you to use React’s latest features, such as
+
+Server Components / Streaming / Server Action / Middleware
+
+### structuere
+
+app router has so many deafult setting on official document. you can refer to [This](https://nextjs.org/docs/getting-started/project-structure).
+
+## 1.Routing
+
+![](https://cdn-images-1.medium.com/max/2508/1*tbohyRhudWB0E6iX7_METQ.png)
+
+Next.js uses a file-system based router where:
+
+* Folders are used to define routes. A route is a single path of nested folders, following the file-system hierarchy from the root folder down to a final leaf folder that includes a page.js file.
+
+![](https://cdn-images-1.medium.com/max/2480/1*W7E4gvd8qe_W3YA_QfRTxQ.png)
+
+Next.js provides a set of special files to create UI with specific behavior in nested routes, let’s introduce some important files below
+
+[layout](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#layouts) Shared UI for a segment and its children
+
+[page](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#pages)Unique UI of a route and make routes publicly accessible
+
+[loading](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming)Loading UI for a segment and its children
+
+
+### Component Hierarchy
+
+The React components defined in special files of a route segment are rendered in a specific hierarchy:
+
+![](https://cdn-images-1.medium.com/max/2488/1*-P1yftbRzCnsJnYF04ulQQ.png)
+
+In a nested route, the components of a segment will be nested inside the components of its parent segment.
+
+![](https://cdn-images-1.medium.com/max/2516/1*48y10LSGB8y7BmqYzdtrXQ.png)
+
+
+### pages & layout
+
+pages — A page is UI that is unique to a route. You can define a page by default exporting a component from a page.js file.
+
+![](https://cdn-images-1.medium.com/max/2492/1*QgfPK-gKP4Ra2ywbhvkHhA.png)
+
+
+```ts
+    // `app/page.tsx` is the UI for the `/` URL
+    export default function Page() {
+      return <h1>Hello, Home page!</h1>
+    }
+```
+
+
+layouts — A layout is UI that is shared between multiple routes. On navigation, layouts preserve state, remain interactive, and do not re-render. Layouts can also be [nested](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#nesting-layouts).
+
+You can define a layout by default exporting a React component from a layout.js file. The component should accept a children prop that will be populated with a child layout (if it exists) or a page during rendering.
+
+For example, the layout will be shared with the /dashboard and /dashboard/settings pages:
+
+![](https://cdn-images-1.medium.com/max/2516/1*QjmTx9Z0ER-Xmaz0wEW1qQ.png)
+
+```ts
+    export default function DashboardLayout({
+      children, // will be a page or nested layout
+    }: {
+      children: React.ReactNode
+    }) {
+      return (
+        <section>
+          {/* Include shared UI here e.g. a header or sidebar */}
+          <nav>navigation</nav>
+     
+          {children}
+        </section>
+      )
+    }
+```
+
+as well as Root layout(required)
+
+The root layout is defined at the top level of the app directory and applies to all routes. This layout is required and must contain html and body tags, allowing you to modify the initial HTML returned from the server.
+
+```ts
+    export default function RootLayout({
+      children,
+    }: {
+      children: React.ReactNode
+    }) {
+      return (
+        <html lang="en">
+          <body>
+            {/* Layout UI */}
+            <main>{children}</main>
+          </body>
+        </html>
+      )
+    }
+```
+
+If you were to combine the two layouts above, the root layout (app/layout.js) would wrap the dashboard layout (app/dashboard/layout.js), which would wrap route segments inside app/dashboard/*.
+
+The two layouts would be nested as such:
+
+![](https://cdn-images-1.medium.com/max/2484/1*BNMcE9ndXaQAat51LmWd9g.png)
+
+loading
+
+The special file loading.js helps you create meaningful Loading UI with [React Suspense](https://react.dev/reference/react/Suspense). With this convention, you can show an [instant loading state](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#instant-loading-states) from the server while the content of a route segment loads. The new content is automatically swapped in once rendering is complete.
+
+![](https://cdn-images-1.medium.com/max/2468/1*RuRKik5WASBazP4frkFDkQ.png)
+
+In the same folder, loading.js will be nested inside layout.js. It will automatically wrap the page.js file and any children below in a `<Suspense>`  boundary.
+
+![](https://cdn-images-1.medium.com/max/2532/1*x0hc6KmAstEk3LtXJMTkYA.png)
+
+## 2. streaming
+
+To learn how Streaming works in React and Next.js, it’s helpful to understand Server-Side Rendering (SSR) and its limitations.
+
+With SSR, there’s a series of steps that need to be completed before a user can see and interact with a page:
+
+1. First, all data for a given page is fetched on the server.
+
+1. The server then renders the HTML for the page.
+
+1. The HTML, CSS, and JavaScript for the page are sent to the client.
+
+1. A non-interactive user interface is shown using the generated HTML, and CSS.
+
+1. Finally, React [hydrates](https://react.dev/reference/react-dom/client/hydrateRoot#hydrating-server-rendered-html) the user interface to make it interactive.
+
+![](https://cdn-images-1.medium.com/max/2512/1*EIjikrAAJb1XM5AwcaFAfA.png)
+
+These steps are sequential and blocking, meaning the server can only render the HTML for a page once all the data has been fetched. And, on the client, React can only hydrate the UI once the code for all components in the page has been downloaded.
+
+SSR with React and Next.js helps improve the perceived loading performance by showing a non-interactive page to the user as soon as possible.
+
+![](https://cdn-images-1.medium.com/max/2520/1*nJXcjqoMfUp5Zdcm_zCugg.png)
+
+However, it can still be slow as all data fetching on server needs to be completed before the page can be shown to the user.
+
+Streaming allows you to break down the page’s HTML into smaller chunks and progressively send those chunks from the server to the client.
+
+![](https://cdn-images-1.medium.com/max/2516/1*h6-5GqiD2MxCuTQ6302TdA.png)
+
+This enables parts of the page to be displayed sooner, without waiting for all the data to load before any UI can be rendered.
+
+Streaming works well with React’s component model because each component can be considered a chunk. Components that have higher priority (e.g. product information) or that don’t rely on data can be sent first (e.g. layout), and React can start hydration earlier. Components that have lower priority (e.g. reviews, related products) can be sent in the same server request after their data has been fetched.
+
+![](https://cdn-images-1.medium.com/max/2504/1*YSmsohmqA8vajqKn22hb8g.png)
+
+Streaming is particularly beneficial when you want to prevent long data requests from blocking the page from rendering as it can reduce the [Time To First Byte (TTFB)](https://web.dev/ttfb/) and [First Contentful Paint (FCP)](https://web.dev/first-contentful-paint/). It also helps improve [Time to Interactive (TTI)](https://developer.chrome.com/en/docs/lighthouse/performance/interactive/), especially on slower devices.
+
+### How to use
+
+`<Suspense>` works by wrapping a component that performs an asynchronous action (e.g. fetch data), showing fallback UI (e.g. skeleton, spinner) while it's happening, and then swapping in your component once the action completes.
+
+```ts
+    import { Suspense } from 'react'
+    import { PostFeed, Weather } from './Components'
+     
+    export default function Posts() {
+      return (
+        <section>
+          <Suspense fallback={<p>Loading feed...</p>}>
+            <PostFeed />
+          </Suspense>
+          <Suspense fallback={<p>Loading weather...</p>}>
+            <Weather />
+          </Suspense>
+        </section>
+      )
+    }
+```
+
+By using Suspense, you get the benefits of:
+
+1. Streaming Server Rendering — Progressively rendering HTML from the server to the client.
+
+1. Selective Hydration — React prioritizes what components to make interactive first based on user interaction.
+
+For more Suspense examples and use cases, please see the [React Documentation](https://react.dev/reference/react/Suspense).
+
+### Status Codes(need to try later)
+
+When streaming, a 200 status code will be returned to signal that the request was successful.
+
+The server can still communicate errors or issues to the client within the streamed content itself, for example, when using [redirect](https://nextjs.org/docs/app/api-reference/functions/redirect) or [notFound](https://nextjs.org/docs/app/api-reference/functions/not-found). Since the response headers have already been sent to the client, the status code of the response cannot be updated. This does not affect SEO.
+
+## **3.server component**
+
+React Server Components allow you to write UI that can be rendered and optionally cached on the server. In Next.js, the rendering work is further split by route segments to enable streaming and partial rendering, and there are three different server rendering strategies:
+
+* [Static Rendering](https://nextjs.org/docs/app/building-your-application/rendering/server-components#static-rendering-default)
+
+* [Dynamic Rendering](https://nextjs.org/docs/app/building-your-application/rendering/server-components#dynamic-rendering)
+
+* [Streaming](https://nextjs.org/docs/app/building-your-application/rendering/server-components#streaming)
+
+### Benefits of Server Rendering
+
+There are a couple of benefits to doing the rendering work on the server, including:
+> **Data Fetching**: Server Components allow you to move data fetching to the server, closer to your data source. This can improve performance by reducing time it takes to fetch data needed for rendering, and the number of requests the client needs to make.
+> **Security**: Server Components allow you to keep sensitive data and logic on the server, such as tokens and API keys, without the risk of exposing them to the client.
+> **Caching:** By rendering on the server, the result can be cached and reused on subsequent requests and across users. This can improve performance and reduce cost by reducing the amount of rendering and data fetching done on each request.
+> **Bundle Sizes**: Server Components allow you to keep large dependencies that previously would impact the client JavaScript bundle size on the server. This is beneficial for users with slower internet or less powerful devices, as the client does not have to download, parse and execute any JavaScript for Server Components.
+> Initial Page Load and [First Contentful Paint (FCP)](https://web.dev/fcp/): On the server, we can generate HTML to allow users to view the page immediately, without waiting for the client to download, parse and execute the JavaScript needed to render the page.
+> Search Engine Optimization and Social Network Shareability: The rendered HTML can be used by search engine bots to index your pages and social network bots to generate social card previews for your pages.
+> Streaming: Server Components allow you to split the rendering work into chunks and stream them to the client as they become ready. This allows the user to see parts of the page earlier without having to wait for the entire page to be rendered on the server.
+
+### Using Server Components in Next.js
+
+By default, Next.js uses Server Components. This allows you to automatically implement server rendering with no additional configuration, and you can opt into using Client Components when needed
+
+### How are Server Components rendered?
+
+On the server, Next.js uses React’s APIs to orchestrate rendering. The rendering work is split into chunks: by individual route segments and [Suspense Boundaries](https://react.dev/reference/react/Suspense).
+
+Each chunk is rendered in two steps:
+
+1. React renders Server Components into a special data format called the React Server Component Payload (RSC Payload).
+
+1. Next.js uses the RSC Payload and Client Component JavaScript instructions to render HTML on the server.
+
+Then, on the client:
+
+1. The HTML is used to immediately show a fast non-interactive preview of the route — this is for the initial page load only.
+
+1. The React Server Components Payload is used to reconcile the Client and Server Component trees, and update the DOM.
+
+1. The JavaScript instructions are used to [hydrate](https://react.dev/reference/react-dom/client/hydrateRoot) Client Components and make the application interactive.
+
+### Client Components
+
+Client Components allow you to write interactive UI that can be rendered on the client at request time. In Next.js, client rendering is opt-in, meaning you have to explicitly decide what components React should render on the client.
+
+### Benefits of Client Rendering
+
+There are a couple of benefits to doing the rendering work on the client, including:
+
+* Interactivity: Client Components can use state, effects, and event listeners, meaning they can provide immediate feedback to the user and update the UI.
+
+* Browser APIs: Client Components have access to browser APIs, like [geolocation](https://developer.mozilla.org/docs/Web/API/Geolocation_API) or [localStorage](https://developer.mozilla.org/docs/Web/API/Window/localStorage), allowing you to build UI for specific use cases.
+
+To use Client Components, you can add the React ["use client" directive](https://react.dev/reference/react/use-client) at the top of a file, above your imports.
+
+However, "use client" doesn't need to be defined in every component that needs to be rendered on the client. Once you define the boundary, all child components and modules imported into it are considered part of the client bundle.
+
+The diagram below shows that using onClick and useState in a nested component (toggle.js) will cause an error if the "use client" directive is not defined. This is because, by default, the components are rendered on the server where these APIs are not available. By defining the "use client" directive in toggle.js, you can tell React to render the component and its children on the client, where the APIs are available.
+
+![](https://cdn-images-1.medium.com/max/2508/1*rGATPfUWW_I4VtPnP1Ib4g.png)
+
+### How are Client Components Rendered?
+
+In Next.js, Client Components are rendered differently depending on whether the request is part of a full page load (an initial visit to your application or a page reload triggered by a browser refresh) or a subsequent navigation.
+
+### Full page load
+
+To optimize the initial page load, Next.js will use React’s APIs to render a static HTML preview on the server for both Client and Server Components. This means, when the user first visits your application, they will see the content of the page immediately, without having to wait for the client to download, parse, and execute the Client Component JavaScript bundle.
+
+On the server:
+
+1. React renders Server Components into a special data format called the React Server Component Payload (RSC Payload), which includes references to Client Components.
+
+1. Next.js uses the RSC Payload and Client Component JavaScript instructions to render HTML for the route on the server.
+
+Then, on the client:
+
+1. The HTML is used to immediately show a fast non-interactive initial preview of the route.
+
+1. The React Server Components Payload is used to reconcile the Client and Server Component trees, and update the DOM.
+
+1. The JavaScript instructions are used to [hydrate](https://react.dev/reference/react-dom/client/hydrateRoot) Client Components and make their UI interactive.
+> *What is hydration?*
+> *Hydration is the process of attaching event listeners to the DOM, to make the static HTML interactive. Behind the scenes, hydration is done with the [hydrateRoot](https://react.dev/reference/react-dom/client/hydrateRoot) React API.*
+
+### Subsequent Navigations
+
+On subsequent navigations, Client Components are rendered entirely on the client, without the server-rendered HTML.
+
+This means the Client Component JavaScript bundle is downloaded and parsed. Once the bundle is ready, React will use the RSC Payload to reconcile the Client and Server Component trees, and update the DOM.
+boundary.
+
+
+
+
+
