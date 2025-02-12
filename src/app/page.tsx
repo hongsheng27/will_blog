@@ -26,7 +26,7 @@ export default function Home() {
           ))}
         </div>
         <h1 className="text-3xl capitalize sm:text-5xl md:text-6xl lg:text-7xl">
-          Hi, I'm Hung Sheng, Liu 👋{" "}
+          Hi, I am Hung Sheng, Liu 👋{" "}
           <span className="font-code text-yellow-300">Life.</span> Code.{" "}
           <span className="font-code text-primary">Passion.</span>
         </h1>
