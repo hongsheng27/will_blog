@@ -52,16 +52,17 @@ export default function AboutPage() {
           </div>
         </div>
         <p className="flex-1 text-center text-sm text-muted-foreground lg:text-start xl:text-base">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Sequi, harum
-          odio! Molestias natus possimus dolorem modi libero eaque in aliquam
-          harum recusandae nam! Reprehenderit soluta fuga consequuntur, iure
-          corrupti autem! Lorem ipsum dolor sit amet consectetur adipisicing
-          elit. Modi asperiores voluptate, veritatis non placeat numquam.
-          Repellendus mollitia aut reprehenderit est. Reprehenderit soluta fuga
-          consequuntur, iure corrupti autem! Lorem ipsum dolor sit amet
-          consectetur adipisicing elit. Modi asperiores voluptate, veritatis non
-          placeat numquam. Repellendus mollitia aut reprehenderit est.
-        </p>
+        
+        Hi, I'm Hung Sheng, Liu 🚀 , but you can also call me Will! I'm a front-end engineer from Taiwan, specializing in React.js and Web3.0 development. This is my personal blog, where I share: <br /><br />
+        💻 <strong>Front-end Development:</strong> React.js, Next.js, Redux <br />
+        🌐 <strong>Web3.0 Development:</strong> DApp, Wallet Implementation <br />
+        🏆 <strong>LeetCode Journey:</strong> Problem-Solving Strategies & Algorithm Learning <br />
+        🏄 <strong>Life & Hobbies:</strong> Rock Climbing, Surfing, Board Games <br /><br />
+
+        I enjoy discussing technology and sharing my learning experiences—hope you find something valuable here! 😃 <br /><br />
+      </p>
+
+       
       </div>
     </div>
   );
