@@ -2,7 +2,6 @@ import React from "react";
 import { Metadata } from "next";
 import PageHeader from "@/components/page-header";
 import { blogs as allBlogs } from "#site/content";
-import Image from "next/image";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 
@@ -23,22 +22,12 @@ export default function BlogPage() {
       <hr className="my-8" />
 
       {blogs.length ? (
-        <div className="grid gap-10 sm:grid-cols-2">
+        <div className="grid gap-10 grid-cols-1">
           {blogs.map((blog) => (
             <article
               key={blog.slug}
-              className="group relative flex flex-col space-y-2"
-            >
-              {blog.image && (
-                <Image
-                  src={blog.image}
-                  alt={blog.title}
-                  width={804}
-                  height={452}
-                  className="border bg-muted transition-colors"
-                />
-              )}
-
+              className="group relative flex flex-col space-y-2 border-b border-[hsl(var(--muted-foreground)_/_0.5)] pb-3"
+            > 
               <h2 className="text-2xl font-extrabold text-primary">
                 {blog.title}
               </h2>

@@ -1,0 +1,99 @@
+---
+title: "The journey of Leetcode(2)"
+description: "Learn how to use Generics"
+image: ""
+date: "2024-06-08"
+author: "hungsheng"
+---
+
+#  Benefits of Server Rendering
+
+#### 1. Data Fetching
+Fetching data from the server, which means it is close to the data source. This can reduce data fetching time and the number of requests clients make, improving performance.
+
+#### 2. Security
+Sensitive data and logic can be kept on the server for better security.
+
+#### 3. Cache
+Caching reused data on the server for better performance.
+
+#### 4. Bundle Size
+Keeping large dependencies on the server benefits users with slow internet and less powerful devices, as they do not need to download too much on the client side.
+
+#### 5. Initial Page Loading
+HTML can be generated to allow users to view the page immediately, without waiting for the client to download, parse, and execute JavaScript needed to render the page.
+
+#### 6. SEO
+Server rendering improves SEO by pre-generating HTML for search engine crawlers and social network bots, enabling better indexing and generating social card previews for pages.
+
+#### 7. Streaming
+By splitting the render work into different parts in server components, users can see some parts earlier instead of waiting for the whole page to finish rendering.
+
+By default, **Next.js** uses server components. Developers can fully control the use of server components or client components based on different scenarios.
+
+
+
+### How Are Server Components Rendered?
+
+The rendering work is split into different parts by individual **route segments** and **Suspense Boundaries**.
+
+Each block is rendered in two steps:
+
+#### **On the Server Side**
+1. React renders Server Components into a special data format called the **React Server Component Payload (RSC Payload)**.
+2. Next.js uses the RSC Payload and Client Component JavaScript instructions to render HTML on the server.
+
+#### **On the Client Side**
+1. The HTML is used to immediately show a fast, non-interactive preview of the route (for initial page load only).
+2. The **React Server Components Payload** is used to reconcile the Client and Server Component trees and update the DOM.
+3. The JavaScript instructions are used to hydrate Client Components and make the application interactive.
+
+
+
+### What is React Server Component Payload (RSC)?
+
+The **RSC Payload** is a compact binary representation of the rendered React Server Components tree. It is used by React on the client to update the browser’s DOM.
+
+The **RSC Payload** contains:
+- The rendered result of Server Components.
+- Placeholders for where Client Components should be rendered and references to their JavaScript files.
+- Any props passed from a Server Component to a Client Component.
+
+
+
+### What is Hydration?
+
+**Hydration** is the process of attaching React event listeners to already-existing HTML DOM nodes, making the page interactive.
+
+
+
+### Server Rendering Strategies
+
+#### **1. Static Rendering (Default)**
+With **static rendering**, routes are rendered at **build time**. It is useful when a route has data that is not personalized to the user and can be known at build time, such as a **static blog post** or a **product page**.
+
+#### **2. Dynamic Rendering**
+With **dynamic rendering**, routes are rendered **for each user at request time**. This is useful when a route contains **personalized data** or data that can only be known at request time, such as:
+- Cookies
+- URL search params (e.g., fetching a specific user profile based on the URL parameters)
+
+**Example:**  
+Users click a button to view a profile → The user ID is set in the URL params → The API fetches specific user data.
+
+**Next.js** automatically selects the best rendering strategy based on the features and APIs used. Instead of manually choosing static or dynamic rendering, developers control **caching** and **revalidation** of specific data, and may opt to **stream** parts of the UI.
+
+
+
+### Streaming
+
+**Streaming** enables progressive UI rendering from the server by splitting work into different blocks. This allows users to see parts of the page **immediately**, before the entire content has finished rendering.
+
+#### **Benefits of Streaming**
+- **Faster initial page load**
+- **Improved user experience for UI dependent on slow data fetches** (e.g., loading reviews on a product page)
+
+Streaming is **built into the Next.js App Router by default**.
+
+
+
+**Source:** [Next.js Documentation](https://nextjs.org/)
